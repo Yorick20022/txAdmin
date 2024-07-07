@@ -27,29 +27,17 @@ export default (config: WebServerConfigType) => {
         disableHeader: true,
         id: (ctx: any) => ctx.txVars.realIP,
     });
-    const chartDataLimiter = KoaRateLimit({
-        driver: 'memory',
-        db: new Map(),
-        max: 10,
-        duration: 30 * 1000,
-        errorMessage: JSON.stringify({ failReason: 'rate_limiter' }),
-        disableHeader: true,
-        id: (ctx: any) => ctx.txVars.realIP,
-    });
 
     //Rendered Pages
     router.get('/legacy/adminManager', webAuthMw, webRoutes.adminManager_page);
     router.get('/legacy/advanced', webAuthMw, webRoutes.advanced_page);
     router.get('/legacy/cfgEditor', webAuthMw, webRoutes.cfgEditor_page);
-    router.get('/legacy/console', webAuthMw, webRoutes.liveConsole);
     router.get('/legacy/dashboard', webAuthMw, webRoutes.dashboard);
     router.get('/legacy/diagnostics', webAuthMw, webRoutes.diagnostics_page);
     router.get('/legacy/masterActions', webAuthMw, webRoutes.masterActions_page);
-    router.get('/legacy/players', webAuthMw, webRoutes.player_page);
     router.get('/legacy/resources', webAuthMw, webRoutes.resources);
     router.get('/legacy/serverLog', webAuthMw, webRoutes.serverLog);
     router.get('/legacy/settings', webAuthMw, webRoutes.settings_page);
-    router.get('/legacy/systemLog', webAuthMw, webRoutes.systemLog);
     router.get('/legacy/whitelist', webAuthMw, webRoutes.whitelist_page);
     router.get('/legacy/setup', webAuthMw, webRoutes.setup_get);
     router.get('/legacy/deployer', webAuthMw, webRoutes.deployer_stepper);
@@ -76,6 +64,8 @@ export default (config: WebServerConfigType) => {
     router.get('/deployer/status', apiAuthMw, webRoutes.deployer_status);
     router.post('/deployer/recipe/:action', apiAuthMw, webRoutes.deployer_actions);
     router.post('/settings/save/:scope', apiAuthMw, webRoutes.settings_save);
+    router.get('/settings/banTemplates', apiAuthMw, webRoutes.settings_getBanTemplates);
+    router.post('/settings/banTemplates', apiAuthMw, webRoutes.settings_saveBanTemplates);
 
     //Master Actions
     router.get('/masterActions/backupDatabase', webAuthMw, webRoutes.masterActions_getBackup);
@@ -99,8 +89,9 @@ export default (config: WebServerConfigType) => {
 
     //Data routes
     router.get('/serverLog/partial', apiAuthMw, webRoutes.serverLogPartial);
-    router.get('/chartData/:thread?', chartDataLimiter, webRoutes.chartData);
-    router.post('/database/:action', apiAuthMw, webRoutes.databaseActions);
+    router.get('/systemLog/:scope', apiAuthMw, webRoutes.systemLogs);
+    router.get('/perfChartData/:thread', apiAuthMw, webRoutes.perfChart);
+    router.get('/playerCrashesData', apiAuthMw, webRoutes.playerCrashes);
 
     /*
         FIXME: reorganizar TODAS rotas de logs, incluindo listagem e download
@@ -110,8 +101,15 @@ export default (config: WebServerConfigType) => {
         /logs/:log/download - WEB
     */
 
+    //History routes
+    router.get('/history/stats', apiAuthMw, webRoutes.history_stats);
+    router.get('/history/search', apiAuthMw, webRoutes.history_search);
+    router.get('/history/action', apiAuthMw, webRoutes.history_actionModal);
+    router.post('/history/:action', apiAuthMw, webRoutes.history_actions);
+
     //Player routes
     router.get('/player', apiAuthMw, webRoutes.player_modal);
+    router.get('/player/stats', apiAuthMw, webRoutes.player_stats);
     router.get('/player/search', apiAuthMw, webRoutes.player_search);
     router.post('/player/checkJoin', intercomAuthMw, webRoutes.player_checkJoin);
     router.post('/player/:action', apiAuthMw, webRoutes.player_actions);

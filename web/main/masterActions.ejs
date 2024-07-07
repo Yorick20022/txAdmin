@@ -162,7 +162,7 @@
 
                         <div class="text-center mt-4">
                             <button class="btn btn-sm btn-outline-danger" id="cleandb-submitButton" <%= disableActions %>>
-                                <i class="icon-check"></i> Clean Database
+                                <i class="icon-trash"></i> Clean Database
                             </button>
                         </div>
                     </div>
@@ -190,7 +190,7 @@
     
                         <div class="text-center mt-4">
                             <button class="btn btn-sm btn-outline-danger" id="revokewl-submitButton" <%= disableActions %>>
-                                <i class="icon-check"></i> Revoke Whitelists
+                                <i class="icon-close"></i> Revoke Whitelists
                             </button>
                         </div>
                     </div>
@@ -211,6 +211,19 @@
 
 <script>
     //============================================== General
+    (()=>{
+        if(window.location.hash === '#cleandb'){
+            document.getElementById('nav-cleandb').classList.add('active', 'show');
+            document.getElementById('nav-cleandb-tab').classList.add('active');
+            document.getElementById('nav-general').classList.remove('active', 'show');
+            document.getElementById('nav-general-tab').classList.remove('active');
+        }else if(window.location.hash === '#revokewl'){
+            document.getElementById('nav-revokewl').classList.add('active', 'show');
+            document.getElementById('nav-revokewl-tab').classList.add('active');
+            document.getElementById('nav-general').classList.remove('active', 'show');
+            document.getElementById('nav-general-tab').classList.remove('active');
+        }
+    })();
     (()=>{
         const generalBtnBackupDatabase = document.getElementById('general-btnBackupDatabase');
         const generalBtnResetFXServer = document.getElementById('general-btnResetFXServer');

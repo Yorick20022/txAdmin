@@ -18,14 +18,19 @@ export function ServerSidebar({ isSheet }: ServerSidebarProps) {
         >
             <div className={cn(
                 !isSheet && 'rounded-xl border border-border bg-card text-card-foreground shadow-sm p-4',
+                // !isSheet && 'rounded-xl borderx border-border bg-cardx text-card-foreground shadow-sm px-2',
             )}>
                 <ServerMenu />
             </div>
             <hr className={isSheet ? 'block' : 'hidden'} />
             <div className={cn(
                 !isSheet && 'rounded-xl border border-border bg-card text-card-foreground shadow-sm p-4',
+                // !isSheet && 'rounded-xl borderx border-border bg-cardx text-card-foreground shadow-sm px-2',
                 'flex flex-col gap-4'
             )}>
+                {/* <h2 className="text-lg font-semibold tracking-tight overflow-hidden text-ellipsis">
+                    Controls & Status
+                </h2> */}
                 <ServerControls />
                 <ServerStatus />
                 <ServerSchedule />
@@ -52,7 +57,10 @@ export function ServerSidebar({ isSheet }: ServerSidebarProps) {
 
             {window.txConsts.isWebInterface ? (
                 <div className='flex flex-col items-center justify-center gap-1 text-sm font-light opacity-85 hover:opacity-100'>
-                    <span className="text-muted-foreground text-smx">
+                    <span className={cn(
+                        'text-muted-foreground',
+                        window.txConsts.txaVersion.includes('-') && 'text-destructive-inline font-semibold',
+                    )}>
                         tx: <strong>v{window.txConsts.txaVersion}</strong>
                         &nbsp;|
                         fx: <strong>b{window.txConsts.fxsVersion}</strong>

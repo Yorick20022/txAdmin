@@ -62,6 +62,24 @@ RegisterCommand('txAdmin:menu:openPlayersPage', function()
 end)
 
 
+-- This needs to run even when menu is disabled so the ServerCtx
+-- is updated for react, needed by the Warn page
+RegisterSecureNuiCallback('reactLoaded', function(_, cb)
+  debugPrint("React loaded, requesting ServerCtx.")
+
+  CreateThread(function()
+    updateServerCtx()
+    while ServerCtx == false do Wait(0) end
+    debugPrint("ServerCtx loaded, sending variables.")
+    sendMenuMessage('setGameName', GAME_NAME)
+    sendMenuMessage('setDebugMode', TX_DEBUG_MODE)
+    sendMenuMessage('setServerCtx', ServerCtx)
+    sendMenuMessage('setPermissions', menuPermissions)
+  end)
+
+  cb({})
+end)
+
 
 -- =============================================
 --  The rest of the file will only run if menu is enabled
@@ -79,10 +97,13 @@ RegisterNetEvent('txcl:setAdmin', function(username, perms, rejectReason)
     debugPrint("^2[AUTH] logged in as '" .. username .. "' with perms: " .. json.encode(perms or "nil"))
     menuIsAccessible = true
     menuPermissions = perms
-    RegisterKeyMapping('txadmin', 'Menu: Open Main Page', 'keyboard', '')
-    RegisterKeyMapping('txAdmin:menu:openPlayersPage', 'Menu: Open Players page', 'KEYBOARD', '')
-    RegisterKeyMapping('txAdmin:menu:noClipToggle', 'Menu: Toggle NoClip', 'keyboard', '')
-    RegisterKeyMapping('txAdmin:menu:togglePlayerIDs', 'Menu: Toggle Player IDs', 'KEYBOARD', '')
+    if IS_FIVEM then
+        RegisterKeyMapping('txadmin', 'Menu: Open Main Page', 'keyboard', '')
+        RegisterKeyMapping('txAdmin:menu:openPlayersPage', 'Menu: Open Players page', 'KEYBOARD', '')
+        RegisterKeyMapping('txAdmin:menu:noClipToggle', 'Menu: Toggle NoClip', 'keyboard', '')
+        RegisterKeyMapping('txAdmin:menu:togglePlayerIDs', 'Menu: Toggle Player IDs', 'KEYBOARD', '')
+        RegisterKeyMapping('txAdmin:menu:tpToWaypoint', 'Menu: Teleport to Waypoint', 'KEYBOARD', '')
+    end
   else
     noMenuReason = tostring(rejectReason)
     debugPrint("^3[AUTH] rejected (" .. noMenuReason .. ")")
@@ -103,7 +124,6 @@ local function retryAuthentication()
   debugPrint("^5[AUTH] Retrying menu authentication.")
   menuIsAccessible = false
   menuPermissions = {}
-  sendMenuMessage('resetSession')
   sendMenuMessage('setPermissions', menuPermissions)
   TriggerServerEvent('txsv:checkIfAdmin')
 end
@@ -153,22 +173,6 @@ RegisterSecureNuiCallback('focusInputs', function(shouldFocus, cb)
   cb({})
 end)
 
-
-RegisterSecureNuiCallback('reactLoaded', function(_, cb)
-  debugPrint("React loaded, requesting ServerCtx.")
-
-  CreateThread(function()
-    updateServerCtx()
-    while ServerCtx == false do Wait(0) end
-    debugPrint("ServerCtx loaded, sending variables.")
-    sendMenuMessage('setGameName', GAME_NAME)
-    sendMenuMessage('setDebugMode', TX_DEBUG_MODE)
-    sendMenuMessage('setServerCtx', ServerCtx)
-    sendMenuMessage('setPermissions', menuPermissions)
-  end)
-
-  cb({})
-end)
 
 -- When the escape key is pressed in menu
 RegisterSecureNuiCallback('closeMenu', function(_, cb)

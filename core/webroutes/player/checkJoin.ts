@@ -2,12 +2,13 @@ const modulename = 'WebServer:PlayerCheckJoin';
 import cleanPlayerName from '@shared/cleanPlayerName';
 import { GenericApiErrorResp } from '@shared/genericApiTypes';
 import { DatabaseActionType, DatabaseWhitelistApprovalsType } from '@core/components/PlayerDatabase/databaseTypes';
-import { anyUndefined, filterPlayerHwids, now, parsePlayerIds, PlayerIdsObjectType } from '@core/extras/helpers';
+import { anyUndefined, filterPlayerHwids, now, parsePlayerIds } from '@core/extras/helpers';
+import type { PlayerIdsObjectType } from "@shared/otherTypes";
 import xssInstancer from '@core/extras/xss';
 import playerResolver from '@core/playerLogic/playerResolver';
 import humanizeDuration, { Unit } from 'humanize-duration';
 import consoleFactory from '@extras/console';
-import { TimeCounter } from '@core/components/StatisticsManager/statsUtils';
+import { TimeCounter } from '@core/components/StatsManager/statsUtils';
 import { InitializedCtx } from '@core/components/WebServer/ctxTypes';
 import TxAdmin from '@core/txAdmin';
 const console = consoleFactory(modulename);
@@ -35,7 +36,7 @@ const rejectMessageTemplate = (title: string, content: string) => {
         <p style="font-size: 1.25rem; padding: 0px">
             ${content}
         </p>
-        <img src="https://i.imgur.com/5bFhvBv.png" style="
+        <img src="https://forum-cfx-re.akamaized.net/original/5X/c/3/8/e/c38e8346a39c6483385c0727bee5c2abc705156a.png" style="
             position: absolute;
             right: 15px;
             bottom: 15px;
@@ -99,7 +100,7 @@ export default async function PlayerCheckJoin(ctx: InitializedCtx) {
         if (ctx.txAdmin.playerDatabase.config.onJoinCheckBan) {
             const checkTime = new TimeCounter();
             const result = checkBan(ctx.txAdmin, validIdsArray, validIdsObject, validHwidsArray);
-            ctx.txAdmin.statisticsManager.banCheckTime.count(checkTime.stop().milliseconds);
+            ctx.txAdmin.statsManager.txRuntime.banCheckTime.count(checkTime.stop().milliseconds);
             if (!result.allow) return sendTypedResp(result);
         }
 
@@ -107,25 +108,25 @@ export default async function PlayerCheckJoin(ctx: InitializedCtx) {
         if (ctx.txAdmin.playerDatabase.config.whitelistMode === 'adminOnly') {
             const checkTime = new TimeCounter();
             const result = await checkAdminOnlyMode(ctx.txAdmin, validIdsArray, validIdsObject, playerName);
-            ctx.txAdmin.statisticsManager.whitelistCheckTime.count(checkTime.stop().milliseconds);
+            ctx.txAdmin.statsManager.txRuntime.whitelistCheckTime.count(checkTime.stop().milliseconds);
             if (!result.allow) return sendTypedResp(result);
 
         } else if (ctx.txAdmin.playerDatabase.config.whitelistMode === 'approvedLicense') {
             const checkTime = new TimeCounter();
             const result = await checkApprovedLicense(ctx.txAdmin, validIdsArray, validIdsObject, validHwidsArray, playerName);
-            ctx.txAdmin.statisticsManager.whitelistCheckTime.count(checkTime.stop().milliseconds);
+            ctx.txAdmin.statsManager.txRuntime.whitelistCheckTime.count(checkTime.stop().milliseconds);
             if (!result.allow) return sendTypedResp(result);
 
         } else if (ctx.txAdmin.playerDatabase.config.whitelistMode === 'guildMember') {
             const checkTime = new TimeCounter();
             const result = await checkGuildMember(ctx.txAdmin, validIdsArray, validIdsObject, playerName);
-            ctx.txAdmin.statisticsManager.whitelistCheckTime.count(checkTime.stop().milliseconds);
+            ctx.txAdmin.statsManager.txRuntime.whitelistCheckTime.count(checkTime.stop().milliseconds);
             if (!result.allow) return sendTypedResp(result);
 
         } else if (ctx.txAdmin.playerDatabase.config.whitelistMode === 'guildRoles') {
             const checkTime = new TimeCounter();
             const result = await checkGuildRoles(ctx.txAdmin, validIdsArray, validIdsObject, playerName);
-            ctx.txAdmin.statisticsManager.whitelistCheckTime.count(checkTime.stop().milliseconds);
+            ctx.txAdmin.statsManager.txRuntime.whitelistCheckTime.count(checkTime.stop().milliseconds);
             if (!result.allow) return sendTypedResp(result);
         }
 

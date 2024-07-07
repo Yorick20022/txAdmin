@@ -52,9 +52,11 @@
                 ├─ Admin: <code><%= txadmin.loggerStatusAdmin %></code> <br>
                 ├─ FXServer: <code><%= txadmin.loggerStatusFXServer %></code> <br>
                 └─ Server: <code><%= txadmin.loggerStatusServer %></code> <br>
-                <strong>Join Check Times (cnt / q5 / q25 / q50 / q75 / q95):</strong> <br>
-                ├─ Ban: <code><%= txadmin.banCheckTime %></code> <br>
-                └─ Whitelist: <code><%= txadmin.whitelistCheckTime %></code> <br>
+                <strong>Performance Times (cnt / q5 / q25 / q50 / q75 / q95):</strong> <br>
+                ├─ BanCheck: <code><%= txadmin.banCheckTime %></code> <br>
+                └─ WhitelistCheck: <code><%= txadmin.whitelistCheckTime %></code> <br>
+                └─ PlayersTable: <code><%= txadmin.playersTableSearchTime %></code> <br>
+                └─ HistoryTable: <code><%= txadmin.historyTableSearchTime %></code> <br>
             </div>
         </div>
 
@@ -189,7 +191,7 @@
                                 <li><strong>Settings:</strong> the Discord Bot Token will be removed</li>
                                 <li><strong>Admin List:</strong> the password hashes will not be sent</li>
                                 <li><strong>Env Vars:</strong> parameters with <code>key, license, pass, private, secret, token</code> in their name will be masked.</li>
-                                <li><strong>CFG Files:</strong> known secret parameters will be masked (ex license, mysql string, tebex secret, etc).</li>
+                                <li><strong>CFG Files:</strong> known secret parameters will be masked (ex license, mysql string, tebex secret, webhooks, etc).</li>
                                 <li><strong>Logs:</strong> any identifiable IPv4 address in logs will be masked.</li>
                             </ul>
                         </li>

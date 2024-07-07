@@ -68,9 +68,6 @@ export default async function AuthProviderCallback(ctx: InitializedCtx) {
         } satisfies CfxreSessAuthType;
         ctx.sessTools.set({ auth: sessData });
 
-        //Save the updated provider identifier & data to the admins file
-        ctx.txAdmin.adminVault.refreshAdminSocialData(vaultAdmin.name, 'citizenfx', fivemIdentifier, userInfo).catch(() => {});
-
         //If the user has a picture, save it to the cache
         if (userInfo.picture) {
             ctx.txAdmin.persistentCache.set(`admin:picture:${vaultAdmin.name}`, userInfo.picture);
@@ -78,8 +75,8 @@ export default async function AuthProviderCallback(ctx: InitializedCtx) {
 
         const authedAdmin = new AuthedAdmin(ctx.txAdmin, vaultAdmin, sessData.csrfToken);
         authedAdmin.logAction(`logged in from ${ctx.ip} via cfxre`);
-        ctx.txAdmin.statisticsManager.loginOrigins.count(ctx.txVars.hostType);
-        ctx.txAdmin.statisticsManager.loginMethods.count('citizenfx');
+        ctx.txAdmin.statsManager.txRuntime.loginOrigins.count(ctx.txVars.hostType);
+        ctx.txAdmin.statsManager.txRuntime.loginMethods.count('citizenfx');
         return ctx.send<ReactAuthDataType>(authedAdmin.getAuthData());
     } catch (error) {
         ctx.sessTools.destroy();
